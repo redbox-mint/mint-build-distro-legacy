@@ -5,9 +5,18 @@ services:
 before_install:
 - mkdir /tmp/build
 - docker pull qcifengineering/redbox-builder
-- docker run -v /tmp/build:/build -e "CLONEPATH=https://github.com/redbox-mint/mint-build-distro-legacy.git" qcifengineering/redbox-builder
+- docker run -v /tmp/build:/build -e "CLONEPATH=https://github.com/redbox-mint/mint-build-distro-legacy.git"
+  qcifengineering/redbox-builder
 install: true
-script: docker run -v /tmp/build:/build -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder /bin/bash -c "cd build/src;mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --settings /m2_repo/travis-settings.xml -Dmaven.repo.local=/m2_repo -DskipTests=true -Pbuild-package-data deploy | grep -v 'CHECKSUM.*'| grep -v 'downloaded.*' | grep -v 'Copying.*'| grep -v '\[INFO\].*';mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --settings /m2_repo/travis-settings.xml -Dmaven.repo.local=/m2_repo -DskipTests=true -Pbuild-package deploy | grep -v 'CHECKSUM.*'| grep -v 'downloaded.*' | grep -v 'Copying.*'| grep -v '\[INFO\].*'"
+script: docker run -v /tmp/build:/build -e "SONATYPE_USERNAME=$SONATYPE_USERNAME"
+  -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder /bin/bash
+  -c "cd build/src;mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  --settings /m2_repo/travis-settings.xml -Dmaven.repo.local=/m2_repo -DskipTests=true
+  -Pbuild-package-data deploy | grep -v 'CHECKSUM.*'| grep -v 'downloaded.*' | grep
+  -v 'Copying.*'| grep -v '\[INFO\].*';mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  --settings /m2_repo/travis-settings.xml -Dmaven.repo.local=/m2_repo -DskipTests=true
+  -Pbuild-package deploy | grep -v 'CHECKSUM.*'| grep -v 'downloaded.*' | grep -v
+  'Copying.*'| grep -v '\[INFO\].*'"
 notifications:
   webhooks:
     urls:
@@ -16,3 +25,7 @@ notifications:
     on_failure: never
     on_cancel: never
     on_error: never
+env:
+  global:
+  - secure: SsDw9RLsZm30xx5Br+R0dLMAxpIduO1Nj/i56Se6lkMhWva70x++10NJa1SJdH9i5cNryrxZovE79Z/AzORew1ms4AgvJpQuRwqEAd7fw60VKODm9h40HUh+mnyZ1Shlai65svMVkaiwS5vrav/jb53iwNi9smq5uVosGHoivkb7SvNmib7PBD8P6vsogIRPCUXlpuR8ctCp4fqYHdWdIQ4TxVrSL9WHS+Ytn7ME+t3Tbu1N5DxDJYbNh6da9ttySXzBwoSvMvDcPzbfM8+3fcEbpqkGQEvheyxC0/FzPBRtnSBBJUsogp+zo2zdJ5ez8h/2aXrX0LKsVZDrRFpbCwbsZFdYcsc0WRdN2ozj368MxVxzSLXtj2NAigIap/pUhOPqSU5yl3DTFo8IqEk2v6AyZnSYVSzpaE83nOX41+pEK0MEgLHDCTuphqmNUKNgI6zYWZOcnmGi3KaAitmXL8gepWyVl8NSH9VgOWB6WqujLM2/Ti9C3Ju34+l7ORGEfqtk3yZbo+MnDqFaYErmrctwWGXdpytL6W0T0niHfwuv7soY1JjgtAJm7YzFWOvtTnhaCSHNRxVwSsegjplSDqeIOGNB8wUdCiOsgaGrLh2lQRW1EgyNNtwTfgKcR4sFAE7KXAENGz3gu/HPO87M9ta+6laWjqXPA1Y0txH7vyw=
+  - secure: knPEyHbjDhTbLk14N7G/UEAapc50M7VnZLJ+CH0D6wiATI3v9Mgxh6mscKI3Yu1YgekTBLsSpBZS3GN9YiWBf6jyiZAVc9I4+RVtPiC7MinJNr6vjg2x9soMrLTRMmFwFdUUqOtvSABTGeE0u3D67umaCR1/G/4GFmvEkEOb8sOOT4mOKD4nBm6mCpX6ty96NEAGYtWJYgI4CE8byu+4T6kuxIixtrRgAsn/jvm0f76TJab+KIwNCNVY3p3EafjsoSy3jkvtJPmodBGm13b4P3lgUX2PXgA8MpGQp3glya1r27KKTfiTq9anmMyeeBnvK72ELJsa/4g0bni1I86mJQTH0ZdSyAFhWzszmbzf2B7OfnEfA+UUfiKlRun6n7aj8mlJPqOF8Gb1wP2hveB1lNYDav6vicN3gtNXSA+gaTrSl1o5tH0T2B69sOgxqXR2qMCn7aZvQXAdRan+HBLjUam+F5Gv0n2+8PXAyyxlv1MVWHQ3Ebx43wJD4NTGdMLhcq6SlYEG+6lGmwUrVUKeRYk6TrDQXDmIAKlzDGHJunsFcPUdJv7Swu6qzt5qGugUuZWpcGQFh1a6LslkK2dtiBR/ZZJM0A1XbLO5LJ8VTZBxtKwAU//0KXgVZ4q9oZkdNL8++CnFc0RJlGfBqBiXypsh52GF0weIIeHFm8g2htE=
